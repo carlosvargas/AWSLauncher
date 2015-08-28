@@ -13,7 +13,7 @@ class AWSSpotInstance(object):
 
         self.conn = connection.connect(config)
 
-    def getImages(self, owners):
+    def getImages(self, owners=['self']):
         self.images = list(self.conn.get_all_images(owners=owners))
 
     def getPriceHistory(self, os, instance_type):
@@ -27,10 +27,27 @@ class AWSSpotInstance(object):
             instance_type=instance_type)
 
         return self.history
-        
+
+    def getReservation(self, *reservation_ids):
+        return self.conn.get_all_reservations(
+            instance_ids=list(reservation_ids))
+
+    def getInstanceRequests(self, *request_ids):
+        return self.conn.get_all_spot_instance_requests(
+            request_ids=list(request_ids))
+
+    def create(self, price, image, zone, type):
+        self.conn.request_spot_instances(
+            price=price,
+            image_id=image,
+            count=1,
+            type='one-time',
+            availability_zone_group=zone,
+            instance_type=type)
+
     def printImages(self, owners):
         self.getImages(owners)
-        
+
         print ""
         print "Images for {owners}:".format(owners=owners)
         print "-----"
@@ -41,10 +58,10 @@ class AWSSpotInstance(object):
 
     def printPriceHistory(self, os, instance_type):
         self.getPriceHistory(os, instance_type)
-        
+
         keyfunc = attrgetter('availability_zone')
         history = sorted(self.history, key=keyfunc)
-        
+
         print ""
         print "Prices for: {os} - {type}".format(os=os, type=instance_type)
 
@@ -60,3 +77,13 @@ class AWSSpotInstance(object):
                 print "\t{time} - ${price}".format(
                     price=price.price,
                     time=time.strftime("%Y-%m-%d %I:%M %p"))
+
+    def printReservations(self, *reservation_ids):
+        reservations = self.getReservation(*reservation_ids)
+        requests = self.getInstanceRequests()
+
+        for request in requests:
+            print request
+
+        for reservation in reservations:
+            print reservation
