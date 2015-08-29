@@ -1,6 +1,7 @@
 import click
 import config
 from aws.spot import AWSSpotInstance
+from aws.writers import Console
 
 
 @click.group()
@@ -18,20 +19,25 @@ def spot():
 @click.option("--type", default=lambda: config.default_instance_type)
 def prices(os, type):
     spot = AWSSpotInstance(config)
-    spot.printPriceHistory(os=os, instance_type=type)
+    prices = spot.getPrices(os=os, instance_type=type)
+    Console.prices(os, type, prices)
 
 
 @spot.command()
 @click.option("--owners", prompt=False, default=lambda: ['self'])
 def images(owners):
     spot = AWSSpotInstance(config)
-    spot.printImages(owners=owners)
+    images = spot.getImages(owners=owners)
+    Console.images(images, owners)
 
 
 @spot.command()
 def running():
     spot = AWSSpotInstance(config)
-    spot.getAllReservations()
+    Console.reservations(
+        spot.getInstanceRequests(),
+        spot.getReservation()
+    )
 
 
 @spot.command()
@@ -41,13 +47,6 @@ def running():
 @click.option("--type", default=lambda: config.default_instance_type)
 def create(price, image, zone, type):
     spot = AWSSpotInstance(config)
-    try:
-        image = int(image)
-        spot.getImages()
-        image = spot.images[image].id
-    except ValueError:
-        pass
-
     spot.create(price=price, image=image, zone=zone, type=type)
 
 
