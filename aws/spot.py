@@ -20,10 +20,9 @@ class AWSSpotInstance(object):
         from_date = to_date - timedelta(minutes=15)
 
         self.history = self.conn.get_spot_price_history(
-            start_time=from_date.isoformat(),
-            end_time=to_date.isoformat(),
             product_description=os,
-            instance_type=instance_type)
+            instance_type=instance_type,
+            max_results=8)
 
         return self.history
 

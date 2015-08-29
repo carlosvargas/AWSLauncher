@@ -1,4 +1,5 @@
 from datetime import datetime
+from dateutil import tz
 from itertools import groupby
 from operator import attrgetter
 
@@ -26,18 +27,15 @@ class Console(object):
         for zone, prices in groupby(prices, key=keyfunc):
             Console._header(zone)
             for price in prices:
-                time = datetime.strptime(
-                    price.timestamp,
-                    "%Y-%m-%dT%H:%M:%S.%fZ")
-
                 print "\t{time} - ${price}".format(
                     price=price.price,
-                    time=time.strftime("%Y-%m-%d %I:%M %p"))
+                    time=Console._convertTime(price.timestamp))
 
     @staticmethod
     def reservations(requests, reservations):
         Console._header("Requests")
         for request in requests:
+            request.create_time = Console._convertTime(request.create_time)
             print "{id}: {instance_id} {price} {state} {status} {create_time}".format(**request.__dict__)
 
         Console._header("Reservations")
@@ -53,3 +51,16 @@ class Console(object):
         print ""
         print text
         print "-----"
+
+    @staticmethod
+    def _convertTime(time):
+        from_zone = tz.gettz('UTC')
+        to_zone = tz.tzlocal()
+
+        utc = datetime.strptime(
+                time,
+                "%Y-%m-%dT%H:%M:%S.%fZ")
+        utc = utc.replace(tzinfo=from_zone)
+        local = utc.astimezone(to_zone)
+
+        return local.strftime("%Y-%m-%d %I:%M %p")
