@@ -49,6 +49,17 @@ def create(price, image, zone, type):
     spot = AWSSpotInstance(config)
     spot.create(price=price, image=image, zone=zone, type=type)
 
+@spot.command()
+@click.option("--id", prompt="Enter the id to cancel ")
+def cancel(id):
+    spot = AWSSpotInstance(config)
+    requests = spot.cancel(id)
+
+    if isinstance(requests, list):
+        Console.reservations(requests, [])
+    else:
+        Console.error(requests)
+
 
 cli = click.CommandCollection(sources=[spots])
 

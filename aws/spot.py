@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import connection
+import boto
 
 
 class AWSSpotInstance(object):
@@ -37,8 +38,8 @@ class AWSSpotInstance(object):
     def create(self, price, image, zone, type):
         try:
             image = int(image)
-            spot.getImages()
-            image = spot.images[image].id
+            self.getImages()
+            image = self.images[image].id
         except ValueError:
             pass
 
@@ -47,5 +48,14 @@ class AWSSpotInstance(object):
             image_id=image,
             count=1,
             type='one-time',
-            availability_zone_group=zone,
+            placement=zone,
             instance_type=type)
+
+    def cancel(self, request_id):
+        try:
+            request = self.getInstanceRequests(request_id)[0]
+            request.cancel()
+            return self.getInstanceRequests()
+        except boto.exception.EC2ResponseError as e:
+            _, errortext = e.errors[0]
+            return errortext

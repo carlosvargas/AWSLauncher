@@ -2,6 +2,8 @@ from datetime import datetime
 from itertools import groupby
 from operator import attrgetter
 
+import click
+
 class Console(object):
     @staticmethod
     def images(images, owners):
@@ -22,9 +24,7 @@ class Console(object):
         print "Prices for: {os} - {type}".format(os=os, type=instance_type)
 
         for zone, prices in groupby(prices, key=keyfunc):
-            print ""
-            print zone
-            print "-----"
+            Console._header(zone)
             for price in prices:
                 time = datetime.strptime(
                     price.timestamp,
@@ -36,8 +36,20 @@ class Console(object):
 
     @staticmethod
     def reservations(requests, reservations):
+        Console._header("Requests")
         for request in requests:
-            print request
+            print "{id}: {instance_id} {price} {state} {status} {create_time}".format(**request.__dict__)
 
+        Console._header("Reservations")
         for reservation in reservations:
             print reservation
+
+    @staticmethod
+    def error(text):
+        click.echo(click.style(text, fg='red'))
+
+    @staticmethod
+    def _header(text):
+        print ""
+        print text
+        print "-----"
