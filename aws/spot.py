@@ -58,3 +58,13 @@ class AWSSpotInstance(object):
         except boto.exception.EC2ResponseError as e:
             _, errortext = e.errors[0]
             return errortext
+
+    def terminate(self, reservation_id):
+        try:
+            reservation = self.getReservation(reservation_id)[0]
+            instance = reservation.instances[0]
+            instance.terminate()
+            return self.getReservation()
+        except boto.exception.EC2ResponseError as e:
+            _, errortext = e.errors[0]
+            return errortext

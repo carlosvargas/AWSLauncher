@@ -40,7 +40,9 @@ class Console(object):
 
         Console._header("Reservations")
         for reservation in reservations:
-            print reservation
+            instance = reservation.instances[0]
+            instance.__dict__['state'] = instance.state
+            print "{id}: {ip_address} {instance_type} {state}".format(**instance.__dict__)
 
     @staticmethod
     def error(text):

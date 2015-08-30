@@ -60,6 +60,17 @@ def cancel(id):
     else:
         Console.error(requests)
 
+@spot.command()
+@click.option("--id", prompt="Enter the id to terminate ")
+def terminate(id):
+    spot = AWSSpotInstance(config)
+    instances = spot.terminate(id)
+
+    if isinstance(instances, list):
+        Console.reservations([], instances)
+    else:
+        Console.error(instances)
+
 
 cli = click.CommandCollection(sources=[spots])
 
