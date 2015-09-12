@@ -14,6 +14,7 @@ class AWSSpotInstance(object):
 
     def getImages(self, owners=['self']):
         self.images = list(self.conn.get_all_images(owners=owners))
+        return self.images
 
     def getPrices(self, os, instance_type):
         to_date = datetime.now()

@@ -11,6 +11,9 @@ class Console(object):
         print ""
         print "Images for {owners}:".format(owners=owners)
         print "-----"
+        if not len(images):
+            print "No images found."
+
         for number, image in enumerate(images):
             print "\t{number}. {name}: {id} {region}".format(
                 number=number, name=image.name,
