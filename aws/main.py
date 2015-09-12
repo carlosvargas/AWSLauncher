@@ -45,9 +45,11 @@ def running():
 @click.option("--image", prompt="Enter the image id ")
 @click.option("--zone", prompt="Enter the zone name ")
 @click.option("--type", default=lambda: config.default_instance_type)
-def create(price, image, zone, type):
+@click.option("--security_group_id", default=lambda: config.default_security_group_id)
+def create(price, image, zone, type, security_group_id):
     spot = AWSSpotInstance(config)
-    spot.create(price=price, image=image, zone=zone, type=type)
+    spot.create(price=price, image=image, zone=zone, type=type,
+        security_group_id=security_group_id)
 
 @spot.command()
 @click.option("--id", prompt="Enter the id to cancel ")

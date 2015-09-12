@@ -34,7 +34,7 @@ class AWSSpotInstance(object):
         return self.conn.get_all_spot_instance_requests(
             request_ids=list(request_ids))
 
-    def create(self, price, image, zone, type):
+    def create(self, price, image, zone, type, security_group_id):
         try:
             image = int(image)
             self.getImages()
@@ -48,7 +48,8 @@ class AWSSpotInstance(object):
             count=1,
             type='one-time',
             placement=zone,
-            instance_type=type)
+            instance_type=type,
+            security_group_ids=[security_group_id])
 
     def cancel(self, request_id):
         try:
