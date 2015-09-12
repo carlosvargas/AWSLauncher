@@ -15,8 +15,8 @@ def spot():
 
 
 @spot.command()
-@click.option("--os", default=lambda: config.default_os)
-@click.option("--type", default=lambda: config.default_instance_type)
+@click.option("--os", prompt=True, default=lambda: config.default_os)
+@click.option("--type", prompt=True, default=lambda: config.default_instance_type)
 def prices(os, type):
     spot = AWSSpotInstance(config)
     prices = spot.getPrices(os=os, instance_type=type)
